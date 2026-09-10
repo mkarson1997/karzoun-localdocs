@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - "Package.swift"
+      - "Sources/**"
+      - "Tests/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "RELEASE_NOTES.md"
+      - "docs/**"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Release package validation
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show Swift toolchain
+        run: swift --version
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            version="0.0.0-pr.${{ github.event.pull_request.number }}"
+          else
+            version="0.0.0-dev.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release build and tests
+        run: |
+          swift test -c release --parallel
+          swift build -c release
+          swift build -c release --product localdocs-example
+
+      - name: Build reviewed source archive
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          git archive \
+            --format=tar.gz \
+            --prefix="karzoun-localdocs-${VERSION}/" \
+            -o "artifacts/karzoun-localdocs-${VERSION}-source.tar.gz" \
+            HEAD
+          (
+            cd artifacts
+            shasum -a 256 "karzoun-localdocs-${VERSION}-source.tar.gz" > SHA256SUMS.txt
+            shasum -a 256 -c SHA256SUMS.txt
+          )
+
+      - name: Upload reviewed release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: localdocs-release-${{ steps.version.outputs.version }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [package]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout release notes
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download reviewed release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: localdocs-release-${{ steps.version.outputs.version }}
+          path: artifacts
+
+      - name: Verify downloaded bundle
+        run: |
+          cd artifacts
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Attest source archive provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: artifacts/*.tar.gz
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" artifacts/* \
+            --title "Karzoun LocalDocs $GITHUB_REF_NAME" \
+            --notes-file RELEASE_NOTES.md
