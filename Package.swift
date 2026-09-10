@@ -16,7 +16,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "LocalDocsCore"
+            name: "LocalDocsCore",
+            linkerSettings: [
+                .linkedFramework("Security")
+            ]
         ),
         .testTarget(
             name: "LocalDocsCoreTests",
