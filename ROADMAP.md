@@ -17,7 +17,10 @@
 - Apple Keychain adapter
 
 ## Apple integration
-- sandbox/security-scoped URL adapter
+- security-scoped URL access lease
+- macOS security-scoped bookmark creation/resolution
+- explicit stale-bookmark reporting
+- testable access-controller abstraction
 - incremental filesystem change handling
 - Finder/SwiftUI host example where useful
 
