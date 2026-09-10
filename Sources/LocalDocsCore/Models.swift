@@ -56,4 +56,11 @@ public enum LocalDocsError: Error, Equatable, Sendable {
     case catalogRootMismatch(expected: String, found: String)
     case unsupportedSnapshotVersion(Int)
     case invalidRelativePath(String)
+    case invalidMetadataKeyLength(Int)
+    case unsupportedEncryptedEnvelopeVersion(Int)
+    case unsupportedEncryptionAlgorithm(String)
+    case invalidEncryptedEnvelope
+    case metadataAuthenticationFailed
+    case keychainFailure(Int32)
+    case keychainReturnedInvalidData
 }
