@@ -10,10 +10,15 @@ permissions:
   contents: read
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze Swift
     runs-on: macos-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -26,7 +31,9 @@ jobs:
           build-mode: manual
 
       - name: Build under CodeQL tracing
-        run: swift build -c release
+        run: |
+          swift package clean
+          swift build -c release --arch "$(uname -m)"
 
       - name: Analyze
         uses: github/codeql-action/analyze@v4
