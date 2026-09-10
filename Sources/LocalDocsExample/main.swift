@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import LocalDocsCore
 
@@ -8,7 +9,7 @@ struct LocalDocsExample {
             FileHandle.standardError.write(
                 Data("Usage: localdocs-example <document-root> <vault-file>\n".utf8)
             )
-            Foundation.exit(EXIT_FAILURE)
+            exit(EXIT_FAILURE)
         }
 
         let root = URL(
