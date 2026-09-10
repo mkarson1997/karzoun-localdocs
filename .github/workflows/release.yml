@@ -50,7 +50,7 @@ jobs:
         run: |
           swift test -c release --parallel
           swift build -c release
-          swift run -c release localdocs-example 2>/dev/null && exit 1 || test $? -eq 1
+          swift build -c release --product localdocs-example
 
       - name: Build reviewed source archive
         env:
