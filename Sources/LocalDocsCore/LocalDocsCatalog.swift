@@ -2,13 +2,17 @@ import Foundation
 
 public actor LocalDocsCatalog {
     public let root: URL
-    public let snapshotURL: URL
+    public let vaultURL: URL
 
     private let canonicalRootPath: String
-    private let persistence: CatalogPersistence
+    private let persistence: any CatalogSnapshotPersistence
     private var documentsByPath: [String: DocumentRecord]
 
-    public init(root: URL, snapshotURL: URL) throws {
+    public init(
+        root: URL,
+        vaultURL: URL,
+        keyProvider: any MetadataKeyProvider = KeychainMetadataKeyProvider()
+    ) throws {
         let canonicalRoot = root.resolvingSymlinksInPath().standardizedFileURL
         var isDirectory: ObjCBool = false
 
@@ -19,7 +23,10 @@ public actor LocalDocsCatalog {
             throw LocalDocsError.rootIsNotDirectory(canonicalRoot.path)
         }
 
-        let persistence = CatalogPersistence(snapshotURL: snapshotURL)
+        let persistence = EncryptedCatalogPersistence(
+            vaultURL: vaultURL,
+            keyProvider: keyProvider
+        )
         let loadedSnapshot = try persistence.load()
 
         if let snapshot = loadedSnapshot,
@@ -31,7 +38,7 @@ public actor LocalDocsCatalog {
         }
 
         self.root = canonicalRoot
-        self.snapshotURL = snapshotURL
+        self.vaultURL = vaultURL
         self.canonicalRootPath = canonicalRoot.path
         self.persistence = persistence
         self.documentsByPath = Dictionary(
