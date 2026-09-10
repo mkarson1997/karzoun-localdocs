@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  swift:
+    name: Swift build and deterministic tests
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Swift toolchain
+        run: swift --version
+
+      - name: Validate package manifest
+        run: swift package dump-package > /dev/null
+
+      - name: Debug tests
+        run: swift test --parallel
+
+      - name: Release tests
+        run: swift test -c release --parallel
+
+      - name: Release build
+        run: swift build -c release
+
+  ci-gate:
+    name: CI Gate
+    if: always()
+    needs: [swift]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require Swift CI success
+        run: test "${{ needs.swift.result }}" = "success"
