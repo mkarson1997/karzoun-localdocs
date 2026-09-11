@@ -174,9 +174,7 @@ final class LocalDocsCoreTests: XCTestCase {
         let catalog = try fixture.catalog()
         _ = try await catalog.refresh()
 
-        let wrongProvider = InMemoryMetadataKeyProvider(
-            keyData: Data(repeating: 0xA5, count: 32)
-        )
+        let wrongProvider = InMemoryMetadataKeyProvider()
 
         XCTAssertThrowsError(
             try EncryptedCatalogPersistence(
@@ -271,9 +269,7 @@ private final class Fixture {
         vault = base
             .appendingPathComponent("metadata", isDirectory: true)
             .appendingPathComponent("catalog.localdocs-vault")
-        keyProvider = InMemoryMetadataKeyProvider(
-            keyData: Data(repeating: 0x42, count: 32)
-        )
+        keyProvider = InMemoryMetadataKeyProvider()
 
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
     }
