@@ -12,10 +12,6 @@ let package = Package(
         .library(
             name: "LocalDocsCore",
             targets: ["LocalDocsCore"]
-        ),
-        .executable(
-            name: "localdocs-example",
-            targets: ["LocalDocsExample"]
         )
     ],
     targets: [
@@ -24,10 +20,6 @@ let package = Package(
             linkerSettings: [
                 .linkedFramework("Security")
             ]
-        ),
-        .executableTarget(
-            name: "LocalDocsExample",
-            dependencies: ["LocalDocsCore"]
         ),
         .testTarget(
             name: "LocalDocsCoreTests",
