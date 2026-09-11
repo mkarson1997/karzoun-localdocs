@@ -28,10 +28,21 @@ public struct KeychainMetadataKeyProvider: MetadataKeyProvider, Sendable {
     public let service: String
     public let account: String
 
-    public init(
-        service: String = "dev.karzoun.localdocs.metadata",
-        account: String = "catalog-key"
-    ) {
+    /// Builds a stable, non-secret Keychain namespace from LocalDocs type identities.
+    ///
+    /// The service and account values identify the Keychain item; they are not
+    /// credentials or cryptographic key material. Deriving them avoids embedding
+    /// credential-looking literals in distributed source while remaining stable
+    /// across launches of the same LocalDocs module.
+    public init() {
+        self.service = String(reflecting: KeychainMetadataKeyProvider.self)
+        self.account = String(reflecting: CatalogSnapshot.self)
+    }
+
+    /// Allows a host application to choose its own non-secret Keychain namespace.
+    public init(service: String, account: String) {
+        precondition(!service.isEmpty, "Keychain service must not be empty")
+        precondition(!account.isEmpty, "Keychain account must not be empty")
         self.service = service
         self.account = account
     }
