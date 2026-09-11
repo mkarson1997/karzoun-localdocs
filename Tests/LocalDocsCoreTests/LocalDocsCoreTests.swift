@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import LocalDocsCore
 
-final class LocalDocsCoreTests: XCTestCase {
+internal final class LocalDocsCoreTests: XCTestCase {
     func testRefreshIndexesRegularFilesAndProducesSHA256() async throws {
         let fixture = try Fixture()
         try fixture.write("alpha", to: "docs/a.txt")
