@@ -23,10 +23,15 @@ All notable changes to Karzoun LocalDocs are documented here.
 - migration from the legacy plaintext catalog only after encrypted-write verification
 - Apple security-scoped URL access lease with balanced lifecycle handling
 - macOS security-scoped bookmark creation and resolution with stale-bookmark reporting
-- compiled `localdocs-example` executable target
 - deterministic macOS debug/release test coverage
 - CodeQL Swift analysis
 - tag-driven GitHub Release validation and publication
+
+### Security hardening
+
+- package remains a library-only distribution surface instead of exposing a CLI that accepts arbitrary filesystem paths
+- release tag-derived versions are validated before use in artifact paths
+- metadata keys use `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`
 
 ### Security and privacy boundaries
 
