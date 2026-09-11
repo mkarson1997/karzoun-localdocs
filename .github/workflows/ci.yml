@@ -26,13 +26,13 @@ jobs:
         run: swift package dump-package > /dev/null
 
       - name: Debug tests
-        run: swift test --parallel
+        run: swift test --disable-automatic-resolution --parallel
 
       - name: Release tests
-        run: swift test -c release --parallel
+        run: swift test --disable-automatic-resolution -c release --parallel
 
       - name: Release build
-        run: swift build -c release
+        run: swift build --disable-automatic-resolution -c release
 
   ci-gate:
     name: CI Gate
