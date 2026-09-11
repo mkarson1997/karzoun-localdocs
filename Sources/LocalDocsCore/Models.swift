@@ -61,6 +61,7 @@ public enum LocalDocsError: Error, Equatable, Sendable {
     case unsupportedEncryptionAlgorithm(String)
     case invalidEncryptedEnvelope
     case metadataAuthenticationFailed
+    case keychainAccessControlCreationFailed
     case keychainFailure(Int32)
     case keychainReturnedInvalidData
 }
