@@ -15,8 +15,13 @@ LocalDocs v0.1.0 is the first public release of a privacy-first, local-only docu
 - safe migration from the legacy plaintext catalog
 - Apple security-scoped URL access lease
 - macOS security-scoped bookmark support with stale-bookmark reporting
-- compiled SwiftPM example target
 - deterministic macOS test suite and CodeQL Swift analysis
+
+## Security hardening
+
+- the public package surface is library-only and does not include a command-line tool that accepts arbitrary filesystem paths
+- release tag-derived versions are validated before being used in archive paths
+- the default Keychain metadata key uses a this-device-only accessibility class that requires the device to be unlocked
 
 ## Distribution
 

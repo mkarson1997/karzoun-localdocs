@@ -24,7 +24,6 @@ It indexes a user-selected local directory, keeps document metadata on the devic
 - migration from the legacy plaintext catalog after encrypted-write verification
 - security-scoped URL access lease with balanced lifecycle semantics
 - macOS security-scoped bookmark creation and resolution
-- compiled `localdocs-example` target
 - deterministic temporary-file and access-lifecycle tests
 - macOS CI
 - CodeQL Swift
@@ -61,17 +60,9 @@ print("Indexed: \(documents.count)")
 print("Duplicate groups: \(duplicateGroups.count)")
 ```
 
-The default metadata key provider stores the 256-bit catalog key in Apple Keychain. Tests or specialized hosts can inject another `MetadataKeyProvider`.
+The host application is responsible for obtaining the user-selected filesystem URL through Apple permission UI. LocalDocs does not expose a command-line interface that accepts arbitrary filesystem paths.
 
-## Compiled example
-
-On macOS with Swift 6:
-
-```bash
-swift run localdocs-example /path/to/documents /path/to/localdocs.vault
-```
-
-The example performs a local refresh and prints document and duplicate counts. It does not upload data.
+The default metadata key provider stores the 256-bit catalog key in Apple Keychain using a this-device-only accessibility class that requires the device to be unlocked. Tests or specialized hosts can inject another `MetadataKeyProvider`.
 
 ## Architecture
 
@@ -137,7 +128,7 @@ The package declares macOS 13+ and iOS 16+ compatibility. Current automated CI e
 
 ## Release integrity
 
-Each tagged GitHub Release publishes a reviewed source archive, `SHA256SUMS.txt`, and a build provenance attestation. SwiftPM consumers use the Git tag directly.
+Each tagged GitHub Release publishes a reviewed source archive, `SHA256SUMS.txt`, and a build provenance attestation. Release tag-derived versions are validated before they are used in artifact paths. SwiftPM consumers use the Git tag directly.
 
 ## License
 
