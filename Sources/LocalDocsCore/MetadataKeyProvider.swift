@@ -55,12 +55,22 @@ public struct KeychainMetadataKeyProvider: MetadataKeyProvider, Sendable {
         let key = SymmetricKey(size: .bits256)
         let keyData = key.withUnsafeBytes { Data($0) }
 
+        var accessControlError: Unmanaged<CFError>?
+        guard let accessControl = SecAccessControlCreateWithFlags(
+            nil,
+            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            .userPresence,
+            &accessControlError
+        ) else {
+            throw LocalDocsError.keychainAccessControlCreationFailed
+        }
+
         let addQuery: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
             kSecAttrAccount: account,
             kSecValueData: keyData,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            kSecAttrAccessControl: accessControl
         ]
 
         let status = SecItemAdd(addQuery as CFDictionary, nil)
