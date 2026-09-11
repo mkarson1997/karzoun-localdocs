@@ -49,7 +49,7 @@ public struct KeychainMetadataKeyProvider: MetadataKeyProvider, Sendable {
             kSecAttrService: service,
             kSecAttrAccount: account,
             kSecValueData: keyData,
-            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         ]
 
         let status = SecItemAdd(addQuery as CFDictionary, nil)
