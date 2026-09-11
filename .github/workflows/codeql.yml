@@ -34,7 +34,7 @@ jobs:
       - name: Build under CodeQL tracing
         run: |
           swift package clean
-          swift build -c release --arch "$(uname -m)"
+          swift build --disable-automatic-resolution -c release --arch "$(uname -m)"
 
       - name: Analyze
         uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
