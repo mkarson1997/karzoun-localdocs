@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import LocalDocsCore
 
-final class SecurityScopedAccessTests: XCTestCase {
+internal final class SecurityScopedAccessTests: XCTestCase {
     func testLeaseBalancesStartAndStopExactlyOnce() throws {
         let controller = RecordingSecurityScopedController(allowAccess: true)
         let url = URL(fileURLWithPath: "/tmp/localdocs-test")
